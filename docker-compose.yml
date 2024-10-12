@@ -1,0 +1,32 @@
+version: "3.5"
+services:
+  db:
+    image: postgres:14.1-alpine
+    hostname: db
+    container_name: db
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: fitness-food
+    volumes:
+      - ./db.sql:/docker-entrypoint-initdb.d/db.sql
+    networks:
+      - api-network
+  fitness_food_api:
+    platform: linux/x86_64
+    container_name: fitness_food_api
+    build: .
+    restart: always
+    env_file:
+      - ./.env
+    ports:
+      - "3000:3000"
+    networks:
+      - api-network
+    depends_on:
+      - db
+networks:
+  api-network:
+    driver: bridge

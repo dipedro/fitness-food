@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpStatus } from '@nestjs/common';
 import { HealthResponseDto } from '../dtos/health-response.dto';
 import { HealthService } from '../services/health.service';
+import { ApiResponse } from '@nestjs/swagger';
 
 
 @Controller()
@@ -10,6 +11,7 @@ export class HealthController {
   ) {}
 
   @Get()
+  @ApiResponse({ status: HttpStatus.OK, type: HealthResponseDto })
   async getHealth(): Promise<HealthResponseDto> {
     return this.healthService.getInfo();
   }

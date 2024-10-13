@@ -62,6 +62,15 @@
     "transform": {
       "^.+\\.(t|j)s$": "ts-jest"
     },
+    "moduleNameMapper": {
+      "^@/(.*)$": "<rootDir>/$1",
+      "^@root/(.*)$": "<rootDir>/../$1/",
+      "^@app/(.*)$": "<rootDir>/app/$1/",
+      "^@modules/(.*)$": "<rootDir>/app/modules/$1/",
+      "^@shared/(.*)$": "<rootDir>/app/shared/$1/",
+      "^@databases/(.*)$": "<rootDir>/infra/databases/$1/",
+      "^@infra/(.*)$": "<rootDir>/infra/$1/"
+    },
     "collectCoverageFrom": [
       "**/*.(t|j)s"
     ],

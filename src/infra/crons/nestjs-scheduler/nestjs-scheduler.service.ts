@@ -6,6 +6,10 @@ import { RepositoryNameEnum } from '@shared/enums';
 import { IHttpRequestService } from '@shared/interfaces';
 import { Readable } from 'stream';
 import { createGunzip } from 'zlib';
+import { ICronHistoryRepository } from './repositories/cron-history.repository';
+import { IProductPreloadRepository } from './repositories/product-preload.repository';
+import { Product } from '../../databases/postgres/repositories/product.repository';
+import { IProductRepository } from '@modules/product/repositories/product.repository';
 
 
 @Injectable()
@@ -15,8 +19,15 @@ export class NestJSSchedulerService implements ICronProduct {
   constructor(
     @Inject(RepositoryNameEnum.HTTP_REQUEST_SERVICE)
     private readonly httpRequestService: IHttpRequestService,
+    @Inject(RepositoryNameEnum.CRON_HISTORY_REPOSITORY)
+    private readonly cronHistoryRepository: ICronHistoryRepository,
+    @Inject(RepositoryNameEnum.PRODUCT_PRELOAD_REPOSITORY)
+    private readonly productPreloadRepository: IProductPreloadRepository,
+    @Inject(RepositoryNameEnum.PRODUCT_REPOSITORY)
+    private readonly productRepository: IProductRepository
   ) {}
 
+  // TODO: need refactoring to Single Responsibility Principle
   //@Cron(CronExpression.EVERY_DAY_AT_2AM)
   @Cron(CronExpression.EVERY_MINUTE)
   async handleCronProduct() {
@@ -28,17 +39,21 @@ export class NestJSSchedulerService implements ICronProduct {
 
     const fileNames = body.split('\n') as string[];
 
-    this.removeLastEmptyLine(fileNames);
+    this.removeLastEmptyLineIfExists(fileNames);
 
-    const result = await this.extractDataFromStream(fileNames);
+    const extractedData = await this.extractDataFromStream(fileNames);
 
-    // TODO: Implement the T (transform) from ETL process
+    const transformedData = this.transformData(extractedData);
 
-    // TODO: Implement the L (load) from ETL process
+    const cronId = await this.loadData(transformedData);
 
+    await this.processData(cronId);
+
+    this.logger.log('Cron job is finished');
   }
 
   private async extractDataFromStream(fileNames: string[]): Promise<string[]> {
+    this.logger.log('Starting extraction')
     const result: string[] = [];
     const MAX_LINES_FOR_FILE = 100;
 
@@ -73,11 +88,84 @@ export class NestJSSchedulerService implements ICronProduct {
       }
     }
     
-    this.logger.log('Data fetched from external API', fileNames.length , result.length);
+    this.logger.log('Finish extraction', fileNames.length , result.length);
     return result;
   }
 
-  private removeLastEmptyLine(array: string[]) {
+  private transformData(data: string[]): string[] {
+    this.logger.log('Starting transformation');
+    const fieldsToKeep = [
+      'code',
+      'url',
+      'creator',
+      'created_t',
+      'last_modified_t',
+      'product_name',
+      'quantity',
+      'brands',
+      'categories',
+      'labels',
+      'cities',
+      'purchase_places',
+      'stores',
+      'ingredients_text',
+      'traces',
+      'serving_size',
+      'serving_quantity',
+      'nutriscore_score',
+      'nutriscore_grade',
+      'main_category',
+      'image_url',
+    ];
+
+    const formattedList = data.map((item) => {
+      const parsedItem = JSON.parse(item);
+      const formattedItem: any = {};
+      fieldsToKeep.forEach((field) => {
+        if (parsedItem.hasOwnProperty(field)) {
+          let value = parsedItem[field] as string;
+          
+          if (field === 'code')
+            value = value.replaceAll('"', '');
+
+          const escapedData = value.replace(/'/g, '')
+
+          formattedItem[field] = escapedData;
+        }
+      });
+      return formattedItem;
+    });
+
+    this.logger.log('Finish transformation');
+    return formattedList;
+  }
+
+  async loadData(data: string[]): Promise<number> {
+    this.logger.log('Starting load data');
+    const cronHistoryId = await this.cronHistoryRepository.create();
+
+    await this.productPreloadRepository.createMany({ cronId: cronHistoryId, productData: data });
+
+    this.logger.log('Finish load data');
+
+    return cronHistoryId;
+  }
+
+  async processData(cronId: number) {
+    this.logger.log('Starting process data');
+    const products = await this.productPreloadRepository.findByCronId(cronId);
+
+    await this.productRepository.createMany(products as Product[]);
+
+    await Promise.all([
+      this.productPreloadRepository.updateImportedAt(cronId),
+      this.cronHistoryRepository.updateImportedAt(cronId),
+    ]);
+
+    this.logger.log('Finish process data');
+  }
+
+  private removeLastEmptyLineIfExists(array: string[]) {
     if (array.length && !array[array.length - 1])
       array.pop();
   }

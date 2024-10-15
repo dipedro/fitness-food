@@ -1,5 +1,6 @@
 
 import { PaginateRequestDTO } from "@modules/product/dtos/pagination-request.dto";
+import { ProductStatusEnum } from "@modules/product/enums";
 import { IProductRepository } from "@modules/product/repositories/product.repository";
 import { Pg } from "../Pg";
 
@@ -126,5 +127,15 @@ export class ProductPgRepository implements IProductRepository {
 		const result = await this.pg.query(sql);
 
 		return parseInt(result.rows[0].count);
+	}
+
+	async delete(code: string): Promise<void> {
+		const sql = `
+			UPDATE ${this.TABLE_NAME}
+			SET status = $1
+			WHERE code = $2;
+		`;
+
+		await this.pg.query(sql, [ProductStatusEnum.TRASH, code]);
 	}
 }

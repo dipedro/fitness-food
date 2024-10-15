@@ -6,4 +6,5 @@ export interface IProductRepository {
 	findByCode(code: string): Promise<Product>;
 	findMany(input: PaginateRequestDTO): Promise<Product[]>;
 	count(): Promise<number>;
+	delete(code: string): Promise<void>;
 }

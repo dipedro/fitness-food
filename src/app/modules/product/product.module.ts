@@ -2,6 +2,7 @@ import { ProductPgRepository } from '@infra/databases/postgres/repositories/prod
 import { Module } from '@nestjs/common';
 import { RepositoryNameEnum } from '../../shared/enums';
 import { ProductController } from './controllers/product.controller';
+import { DeleteProductService } from './services/delete-product.service';
 import { FindProductService } from './services/find-product.service';
 import { FindProductsService } from './services/find-products.service';
 
@@ -11,6 +12,7 @@ import { FindProductsService } from './services/find-products.service';
 	providers: [
 		FindProductService,
 		FindProductsService,
+		DeleteProductService,
 		{
 			provide: RepositoryNameEnum.PRODUCT_REPOSITORY,
 			useClass: ProductPgRepository

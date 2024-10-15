@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, HttpStatus, Param, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpStatus, Param, Put, Query } from '@nestjs/common';
 import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { PaginateBaseResponseContract } from '@shared/contracts/paginate-base-response.contract';
 import { PaginatedApiResponse } from '@shared/decorators/paginated-api-response.decorator';
@@ -7,6 +7,8 @@ import { PaginateRequestDTO } from '../dtos/pagination-request.dto';
 import { FindProductService } from '../services/find-product.service';
 import { FindProductsService } from '../services/find-products.service';
 import { DeleteProductService } from '../services/delete-product.service';
+import { UpdateProductService } from '../services/update-product.service';
+import { UpdateProductRequestDTO } from '../dtos/update-product-request.dto';
 
 @ApiTags('Product')
 @Controller('products')
@@ -14,7 +16,8 @@ export class ProductController {
   constructor(
     private readonly findProductService: FindProductService,
     private readonly findProductsService: FindProductsService,
-    private readonly deleteProductService: DeleteProductService
+    private readonly deleteProductService: DeleteProductService,
+    private readonly updateProductService: UpdateProductService
   ) {}
 
   @Get()
@@ -40,5 +43,15 @@ export class ProductController {
     @Param('code') code: string
   ): Promise<void> {
     return this.deleteProductService.execute(code);
+  }
+
+  @Put('/:code')
+  @ApiResponse({ status: HttpStatus.NO_CONTENT })
+  @ApiResponse({ status: HttpStatus.BAD_REQUEST, example: { message: 'No fields to update' } })
+  async updateProduct(
+    @Param('code') code: string,
+    @Body() body: UpdateProductRequestDTO
+  ): Promise<void> {
+    return this.updateProductService.execute(code, body);
   }
 }

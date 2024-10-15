@@ -5,6 +5,7 @@ import { ProductController } from './controllers/product.controller';
 import { DeleteProductService } from './services/delete-product.service';
 import { FindProductService } from './services/find-product.service';
 import { FindProductsService } from './services/find-products.service';
+import { UpdateProductService } from './services/update-product.service';
 
 @Module({
 	imports: [],
@@ -13,6 +14,7 @@ import { FindProductsService } from './services/find-products.service';
 		FindProductService,
 		FindProductsService,
 		DeleteProductService,
+		UpdateProductService,
 		{
 			provide: RepositoryNameEnum.PRODUCT_REPOSITORY,
 			useClass: ProductPgRepository

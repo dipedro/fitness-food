@@ -1,5 +1,6 @@
 
 import { PaginateRequestDTO } from "@modules/product/dtos/pagination-request.dto";
+import { UpdateProductRequestDTO } from "@modules/product/dtos/update-product-request.dto";
 import { ProductStatusEnum } from "@modules/product/enums";
 import { IProductRepository } from "@modules/product/repositories/product.repository";
 import { Pg } from "../Pg";
@@ -137,5 +138,19 @@ export class ProductPgRepository implements IProductRepository {
 		`;
 
 		await this.pg.query(sql, [ProductStatusEnum.TRASH, code]);
+	}
+
+	async update(code: string, body: UpdateProductRequestDTO): Promise<void> {
+		const fields = Object.keys(body);
+
+		const values = fields.map((field) => `${field} = '${body[field]}'`).join(', ');
+
+		const sql = `
+			UPDATE ${this.TABLE_NAME}
+			SET ${values}
+			WHERE code = $1;
+		`;
+
+		await this.pg.query(sql, [code]);
 	}
 }

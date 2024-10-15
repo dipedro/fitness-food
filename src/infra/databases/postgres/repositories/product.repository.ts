@@ -1,6 +1,7 @@
 
-import { Pg } from "../Pg";
+import { PaginateRequestDTO } from "@modules/product/dtos/pagination-request.dto";
 import { IProductRepository } from "@modules/product/repositories/product.repository";
+import { Pg } from "../Pg";
 
 export type Product = {
 	code: string;
@@ -95,12 +96,35 @@ export class ProductPgRepository implements IProductRepository {
 	async findByCode(code: string): Promise<Product> {
 		const sql = `
 			SELECT * FROM ${this.TABLE_NAME}
-			WHERE code = '${code}'
+			WHERE code = $1
 			LIMIT 1;
+		`;
+
+		const result = await this.pg.query(sql, [code]);
+
+		return result.rows[0];
+	}
+
+	async findMany(input: PaginateRequestDTO): Promise<Product[]> {
+		const { page = 1, size = 10 } = input;
+
+		const sql = `
+			SELECT * FROM ${this.TABLE_NAME}
+			LIMIT $1 OFFSET $2;
+		`;
+
+		const result = await this.pg.query(sql, [size, (page - 1) * size]);
+
+		return result.rows;
+	}
+
+	async count(): Promise<number> {
+		const sql = `
+			SELECT COUNT(*) FROM ${this.TABLE_NAME};
 		`;
 
 		const result = await this.pg.query(sql);
 
-		return result.rows[0];
+		return parseInt(result.rows[0].count);
 	}
 }

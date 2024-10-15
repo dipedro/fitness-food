@@ -28,11 +28,11 @@ export const PaginatedApiResponse = <DataDto extends Type<unknown>>(
                             },
                             lastPage: {
                                 type: 'number',
-                                example: 2,
+                                example: 1,
                             },
                             total: {
                                 type: 'number',
-                                example: 20,
+                                example: 1,
                             },
                         },
                     },

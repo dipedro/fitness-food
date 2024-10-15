@@ -8,7 +8,7 @@ import { FindProductService } from '../services/find-product.service';
 import { FindProductsService } from '../services/find-products.service';
 
 @ApiTags('Product')
-@Controller('product')
+@Controller('products')
 export class ProductController {
   constructor(
     private readonly findProductService: FindProductService,
@@ -16,7 +16,6 @@ export class ProductController {
   ) {}
 
   @Get()
-  @ApiResponse({ status: HttpStatus.OK, type: FindProductResponseDto, isArray: true })
   @PaginatedApiResponse(FindProductResponseDto)
   async getProducts(
     @Query() request: PaginateRequestDTO

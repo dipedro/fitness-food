@@ -1,9 +1,9 @@
 import { Controller, Get, HttpStatus } from '@nestjs/common';
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
 import { HealthResponseDto } from '../dtos/health-response.dto';
 import { HealthService } from '../services/health.service';
-import { ApiResponse } from '@nestjs/swagger';
 
-
+@ApiTags('Health')
 @Controller()
 export class HealthController {
   constructor(

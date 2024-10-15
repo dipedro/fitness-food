@@ -24,17 +24,17 @@ export type Product = {
 	nutriscore_grade: string;
 	main_category: string;
 	image_url: string;
-  };
+};
 
 export class ProductPgRepository implements IProductRepository {
 	pg: Pg;
+	TABLE_NAME = 'products';
 
 	constructor() {
 		this.pg = Pg.getInstance();
 	}
 	
 	async createMany(data: Product[]): Promise<void> {
-		const tableName = 'products';
 
 		const values = data.map((product) => `(
 			'${product.code}',
@@ -62,7 +62,7 @@ export class ProductPgRepository implements IProductRepository {
 		.join(', ');
 
 		const sql = `
-			INSERT INTO ${tableName} (
+			INSERT INTO ${this.TABLE_NAME} (
 				code,
 				url,
 				creator,
@@ -90,5 +90,17 @@ export class ProductPgRepository implements IProductRepository {
 		`;
 
 		await this.pg.query(sql);		
+	}
+
+	async findByCode(code: string): Promise<Product> {
+		const sql = `
+			SELECT * FROM ${this.TABLE_NAME}
+			WHERE code = '${code}'
+			LIMIT 1;
+		`;
+
+		const result = await this.pg.query(sql);
+
+		return result.rows[0];
 	}
 }

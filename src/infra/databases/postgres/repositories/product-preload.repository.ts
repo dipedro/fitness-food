@@ -1,14 +1,15 @@
 
 import { CreateManyProductPreloadDto, IProductPreloadRepository } from "@infra/crons/nestjs-scheduler/repositories/product-preload.repository";
-import { Pg } from "../Pg";
+import { IDatabaseService } from "../../interfaces/database.interface";
+import { Inject } from "@nestjs/common";
 
 export class ProductPreloadPgRepository implements IProductPreloadRepository {
-	pg: Pg;
 	TABLE_NAME = 'products_preloads';
 
-	constructor() {
-		this.pg = Pg.getInstance();
-	}
+	constructor(
+		@Inject('IDatabaseService')
+		private readonly pg: IDatabaseService
+	) {}
 	
 	async createMany({ productData, cronId }: CreateManyProductPreloadDto): Promise<void> {
 		const values = productData

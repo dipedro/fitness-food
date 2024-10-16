@@ -1,14 +1,15 @@
 import { IHealthRepository } from "@modules/health/repositories/health.repository";
-import { Pg } from "../Pg";
+import { IDatabaseService } from "../../interfaces/database.interface";
+import { Inject } from "@nestjs/common";
 
 export class HealthPgRepository implements IHealthRepository {
-	pg: Pg;
 	private ERROR_MESSAGE = 'error';
 	private OK_MESSAGE = 'ok';
 
-	constructor() {
-		this.pg = Pg.getInstance();
-	}
+	constructor(
+		@Inject('IDatabaseService')
+		private readonly pg: IDatabaseService
+	) {}
 
 	async getReadStatus(): Promise<string> {
 		try {

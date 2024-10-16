@@ -1,15 +1,15 @@
 
 import { ICronProduct } from '@modules/product/interfaces/cron-product.interface';
+import { IProductRepository } from '@modules/product/repositories/product.repository';
 import { Inject, Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { RepositoryNameEnum } from '@shared/enums';
 import { IHttpRequestService } from '@shared/interfaces';
 import { Readable } from 'stream';
 import { createGunzip } from 'zlib';
+import { Product } from '../../databases/postgres/repositories/product.repository';
 import { ICronHistoryRepository } from './repositories/cron-history.repository';
 import { IProductPreloadRepository } from './repositories/product-preload.repository';
-import { Product } from '../../databases/postgres/repositories/product.repository';
-import { IProductRepository } from '@modules/product/repositories/product.repository';
 
 
 @Injectable()
@@ -28,8 +28,7 @@ export class NestJSSchedulerService implements ICronProduct {
   ) {}
 
   // TODO: need refactoring to Single Responsibility Principle
-  //@Cron(CronExpression.EVERY_DAY_AT_2AM)
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(process.env.CRON_JOB_TIME)
   async handleCronProduct() {
     this.logger.log('Cron job is running...');
 
@@ -88,7 +87,7 @@ export class NestJSSchedulerService implements ICronProduct {
       }
     }
     
-    this.logger.log('Finish extraction', fileNames.length , result.length);
+    this.logger.log(`Finish extraction: ${fileNames.length} files | ${result.length} products`);
     return result;
   }
 

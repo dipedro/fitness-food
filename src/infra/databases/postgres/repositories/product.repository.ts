@@ -3,7 +3,8 @@ import { PaginateRequestDTO } from "@modules/product/dtos/pagination-request.dto
 import { UpdateProductRequestDTO } from "@modules/product/dtos/update-product-request.dto";
 import { ProductStatusEnum } from "@modules/product/enums";
 import { IProductRepository } from "@modules/product/repositories/product.repository";
-import { Pg } from "../Pg";
+import { IDatabaseService } from "../../interfaces/database.interface";
+import { Inject } from "@nestjs/common";
 
 export type Product = {
 	code: string;
@@ -30,12 +31,12 @@ export type Product = {
 };
 
 export class ProductPgRepository implements IProductRepository {
-	pg: Pg;
 	TABLE_NAME = 'products';
 
-	constructor() {
-		this.pg = Pg.getInstance();
-	}
+	constructor(
+		@Inject('IDatabaseService')
+		private readonly pg: IDatabaseService
+	) {}
 	
 	async createMany(data: Product[]): Promise<void> {
 

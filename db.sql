@@ -48,4 +48,4 @@ CREATE TABLE IF NOT EXISTS public.products_preloads (
     import_t TIMESTAMP WITH TIME ZONE
 );
 
-ALTER TABLE products_preloads ADD CONSTRAINT fk_cron_id FOREIGN KEY (cron_id) REFERENCES cron_histories(id);
+ALTER TABLE products_preloads ADD CONSTRAINT fk_cron_id FOREIGN KEY (cron_id) REFERENCES crons_histories(id);

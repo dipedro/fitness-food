@@ -26,5 +26,6 @@
       "@infra/*": ["src/infra/*"],
       "@databases/*": ["src/infra/databases/*"],
     }
-  }
+  },
+  "exclude": ["node_modules", "build", "docs"],
 }

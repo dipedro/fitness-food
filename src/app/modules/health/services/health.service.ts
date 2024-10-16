@@ -23,14 +23,14 @@ export class HealthService {
 
     const lastCronExecution = await this.healthCronHistoryRepository.findLastImportedAt();
 
-    const formattedLastCronExecution = lastCronExecution.toLocaleString('pt-BR', {
+    const formattedLastCronExecution = lastCronExecution?.toLocaleString('pt-BR', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
       hour: '2-digit',
       minute: '2-digit',
       second: '2-digit',
-    });
+    }) || 'Never';
      
     return {
       database: {

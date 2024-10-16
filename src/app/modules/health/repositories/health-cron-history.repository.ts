@@ -1,3 +1,3 @@
 export interface IHealthCronHistoryRepository {
-	findLastImportedAt (): Promise<Date>;
+	findLastImportedAt (): Promise<Date | null>;
 }

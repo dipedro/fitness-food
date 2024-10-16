@@ -49,6 +49,18 @@ docker-compose up
 
 This command will build and start all the necessary containers for the API.
 
+
+## Documentation
+
+The documentation for this project can be accessed in two ways:
+
+1. **API Documentation**: The API documentation can be found by accessing the `/docs` route of the running application. This will provide detailed information about the available endpoints, request/response formats, and any additional information related to the API.
+
+2. **VS Code Extension**: To enhance your development experience, you can also download my custom extension for Visual Studio Code. This extension, called "NestJS Route List", provides a convenient way to view all the routes of your NestJS application directly within your code editor. You can download the extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=PedroAzevedo.nestjs-route-list&ssr=false#overview).
+
+Please note that both options are available to help you navigate and understand the project's documentation effectively.
+
+
 ## Test
 
 ```bash
@@ -78,6 +90,12 @@ $ npm run test:cov
 - In the beginning i threat the column code with a BigInt, but when i finish the load i saw that i lost the zeros when a barcode start with zeros. So i change the column type to VARCHAR(20) to handle with barcodes (EAN-13) or internal codes.
 
 - For prevent errors in the next integration (i'm always getting the same first hundred products in each file), i add the clausule SKIP DUPLICATES in the bulk insert of products.
+
+- I reuse some abstractions that i use in another project to handle with pagination in the /products route.
+
+- I decided remove some properties in the update endpoint, because for me don't make sense update the created_at, code and etc of a product.
+
+- I make a configuration to run the cron job every day at 2AM, because thinking in a use of this API in the early hours of the morning, usage, in theory, is lower.
 
 
 >  This is a challenge by [Coodesh](https://coodesh.com/)

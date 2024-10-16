@@ -1,4 +1,5 @@
 import { HealthInMemoryRepository } from "@databases/in-memory/repositories/health.repository";
+import { CronHistoryInMemoryRepository } from "@infra/databases/in-memory/repositories/cron-history.repository";
 import { Test, TestingModule } from "@nestjs/testing";
 import { RepositoryNameEnum } from "@shared/enums";
 import { HealthService } from "../services/health.service";
@@ -15,6 +16,10 @@ describe('HealthController', () => {
 				{
 					provide: RepositoryNameEnum.HEALTH_REPOSITORY,
 					useClass: HealthInMemoryRepository
+				},
+				{
+					provide: RepositoryNameEnum.HEALTH_CRON_HISTORY_REPOSITORY,
+					useClass: CronHistoryInMemoryRepository
 				}
 			],
 		})

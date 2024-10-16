@@ -52,6 +52,10 @@ This command will build and start all the necessary containers for the API.
 
 ## Documentation
 
+The diagram of how the Cron Jobs works:
+
+![Cron Jobs Diagram](https://i.imgur.com/fPj5Gvo.png)
+
 The documentation for this project can be accessed in two ways:
 
 1. **API Documentation**: The API documentation can be found by accessing the `/docs` route of the running application. This will provide detailed information about the available endpoints, request/response formats, and any additional information related to the API.
